@@ -859,6 +859,7 @@ h1, h2, h3 {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .product-card:hover {
@@ -900,10 +901,12 @@ h1, h2, h3 {
     font-weight: 700;
     margin-bottom: 12px;
     color: var(--rich-black);
+    min-height: 44px;
 }
 
 .product-card ul {
     margin-bottom: 16px;
+    min-height: 78px;
 }
 
 .product-card ul li {
@@ -930,7 +933,8 @@ h1, h2, h3 {
     font-size: 13px;
     color: var(--gray-500);
     line-height: 1.5;
-    flex-grow: 1;
+    min-height: 60px;
+    margin-bottom: 16px;
 }
 
 .perfect-for {
