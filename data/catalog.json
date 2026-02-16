@@ -1,7 +1,7 @@
 [
   {
     "id": "ms-001",
-    "name": "Mockneck!!",
+    "name": "Mocnkecn FN",
     "category": "tops",
     "garmentType": "t-shirt",
     "productionMethod": "screen-print",
@@ -10,7 +10,7 @@
     "minOrder": 15,
     "badge": "ESSENTIAL",
     "description": "Premium cotton tee with sophisticated typography and custom graphics. The go-to piece for any Mitzvah celebration.",
-    "image": "images/products/ms-001.jpg",
+    "image": "/images/products/ms-001.jpg",
     "imageAlt": ""
   },
   {
