@@ -27,9 +27,6 @@ function useHideGlobalLayout() {
 const PASSPHRASE = 'mitzvah2026';
 
 const LS_KEY_PRODUCTS = 'mitzvah-admin-products';
-const LS_KEY_GITHUB_PAT = 'mitzvah-admin-github-pat';
-const GITHUB_REPO = 'chapterclothinco/mitzvah-studio';
-const GITHUB_FILE_PATH = 'data/catalog.json';
 
 const CATEGORIES = [
   { value: 'tops', label: 'Tops' },
@@ -338,108 +335,22 @@ export default function AdminPage() {
       });
   };
 
-  // Save & Deploy to GitHub via Contents API
+  // Save & Deploy via server-side API route
   const saveAndDeploy = async () => {
-    let pat = null;
-    try {
-      pat = localStorage.getItem(LS_KEY_GITHUB_PAT);
-    } catch (e) {
-      // ignore
-    }
-    if (!pat) {
-      pat = prompt(
-        'Enter your GitHub Personal Access Token (PAT).\n\n' +
-        'This token needs "repo" or "contents:write" scope for the\n' +
-        GITHUB_REPO + ' repository.\n\n' +
-        'It will be stored in localStorage for future use.'
-      );
-      if (!pat || !pat.trim()) {
-        showToast('Deploy cancelled \u2014 no token provided', 'error');
-        return;
-      }
-      pat = pat.trim();
-      try {
-        localStorage.setItem(LS_KEY_GITHUB_PAT, pat);
-      } catch (e) {
-        // ignore
-      }
-    }
-
     setDeploying(true);
-
     try {
-      // Step 1: Get current file SHA
-      const getRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`,
-        {
-          headers: {
-            Authorization: `Bearer ${pat}`,
-            Accept: 'application/vnd.github.v3+json',
-          },
-        }
-      );
-
-      let sha = null;
-      if (getRes.ok) {
-        const fileData = await getRes.json();
-        sha = fileData.sha;
-      } else if (getRes.status === 404) {
-        // File doesn't exist yet, will create it
-        sha = null;
-      } else if (getRes.status === 401 || getRes.status === 403) {
-        // Bad token, clear it so user can re-enter
-        try { localStorage.removeItem(LS_KEY_GITHUB_PAT); } catch (e) {}
-        throw new Error('Authentication failed. Your token has been cleared \u2014 try again with a valid token.');
-      } else {
-        throw new Error(`GitHub API error: ${getRes.status} ${getRes.statusText}`);
+      const res = await fetch('/api/save-catalog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Save failed (${res.status})`);
       }
-
-      // Step 2: Base64-encode the catalog JSON
-      const catalogJSON = JSON.stringify(products, null, 2) + '\n';
-      const encoder = new TextEncoder();
-      const bytes = encoder.encode(catalogJSON);
-      let binary = '';
-      for (let i = 0; i < bytes.length; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const base64Content = btoa(binary);
-
-      // Step 3: PUT the updated file
-      const putBody = {
-        message: 'Update catalog.json via admin panel',
-        content: base64Content,
-        branch: 'main',
-      };
-      if (sha) putBody.sha = sha;
-
-      const putRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${pat}`,
-            Accept: 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(putBody),
-        }
-      );
-
-      if (!putRes.ok) {
-        if (putRes.status === 401 || putRes.status === 403) {
-          try { localStorage.removeItem(LS_KEY_GITHUB_PAT); } catch (e) {}
-          throw new Error('Authentication failed. Your token has been cleared \u2014 try again.');
-        }
-        const errData = await putRes.json().catch(() => ({}));
-        throw new Error(errData.message || `GitHub API error: ${putRes.status}`);
-      }
-
-      // Success - clear local changes marker since data is now deployed
-      try {
-        localStorage.removeItem(LS_KEY_PRODUCTS);
-      } catch (e) {}
+      try { localStorage.removeItem(LS_KEY_PRODUCTS); } catch (e) {}
       setHasLocalChanges(false);
-      showToast('Catalog deployed to GitHub! Site rebuild triggered.', 'success');
+      showToast('Catalog saved & deployed! Site rebuild triggered.', 'success');
     } catch (err) {
       showToast('Deploy failed: ' + err.message, 'error');
     } finally {
