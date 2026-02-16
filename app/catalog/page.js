@@ -20,11 +20,10 @@ export default function CatalogPage() {
 
         <div className="catalog-cta-section">
           <div className="catalog-cta-inner">
-            <span className="section-tag">100% Custom</span>
-            <h2>We make <span className="gradient-text">anything</span> you want.</h2>
-            <p>This is just what&apos;s popular. If you have something else in mind &mdash; a jersey, a bucket hat, matching pajama sets, literally anything &mdash; we&apos;ll design it from scratch and manufacture it for you.</p>
+            <h2>Don&apos;t see it? <span className="gradient-text">We&apos;ll build it.</span></h2>
+            <p>Jerseys, bucket hats, matching sets, robes &mdash; you name it. Every single thing we make is designed from scratch and manufactured to order. No templates. No limits. Just tell us what you want.</p>
             <Link href="/#contact" className="btn btn-primary btn-glow">
-              <span>Start Your Project</span>
+              <span>Let&apos;s Talk</span>
               <svg className="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
