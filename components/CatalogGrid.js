@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import catalogData from '@/data/catalog.json';
 
 function getGarmentSVG(type) {
@@ -133,151 +132,43 @@ function formatMethod(method) {
 }
 
 export default function CatalogGrid() {
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [method, setMethod] = useState('all');
-  const [price, setPrice] = useState('all');
-  const [search, setSearch] = useState('');
-
-  const filtered = useMemo(() => {
-    let result = catalogData;
-
-    if (activeCategory !== 'all') {
-      result = result.filter((p) => p.category === activeCategory);
-    }
-
-    if (method !== 'all') {
-      result = result.filter((p) => p.productionMethod === method);
-    }
-
-    if (price !== 'all') {
-      const [min, max] = price.split('-').map(Number);
-      result = result.filter((p) => p.priceMin >= min && p.priceMin < max);
-    }
-
-    if (search) {
-      const term = search.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(term) ||
-          p.description.toLowerCase().includes(term)
-      );
-    }
-
-    return result;
-  }, [activeCategory, method, price, search]);
-
-  const clearFilters = () => {
-    setActiveCategory('all');
-    setMethod('all');
-    setPrice('all');
-    setSearch('');
-  };
-
-  const categories = [
-    { value: 'all', label: 'All', icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg> },
-    { value: 'tops', label: 'Tops', icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4L2 6L3.5 8L4 7.5V14H12V7.5L12.5 8L14 6L12 4"/><path d="M4 4C4 4 6 6 8 6C10 6 12 4 12 4"/></svg> },
-    { value: 'bottoms', label: 'Bottoms', icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3H13V6C13 6 13 8 12 10L10 14H8.5L8 10L7.5 14H6L4 10C3 8 3 6 3 6V3Z"/></svg> },
-    { value: 'accessories', label: 'Accessories', icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="6" width="10" height="8" rx="1"/><path d="M6 6V4.5C6 4.5 6 2.5 8 2.5C10 2.5 10 4.5 10 4.5V6"/></svg> },
-    { value: 'sleepwear', label: 'Sleepwear', icon: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 3L2 5L3 8L5 7V14H7.5L8 10L8.5 14H11V7L13 8L14 5L11 3"/><path d="M5 3C5 3 6.5 5 8 5C9.5 5 11 3 11 3"/></svg> },
-  ];
+  const products = catalogData.slice(0, 16);
 
   return (
-    <>
-      <div className="catalog-toolbar">
-        <div className="catalog-category-filters">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              className={`cat-filter-btn${activeCategory === cat.value ? ' active' : ''}`}
-              onClick={() => setActiveCategory(cat.value)}
-            >
-              {cat.icon}
-              {cat.label}
-            </button>
-          ))}
-        </div>
-        <div className="catalog-toolbar-right">
-          <select
-            className="catalog-select"
-            value={method}
-            onChange={(e) => setMethod(e.target.value)}
-          >
-            <option value="all">All Methods</option>
-            <option value="cut-and-sew">Cut &amp; Sew</option>
-            <option value="screen-print">Screen Print</option>
-            <option value="embroidered">Embroidered</option>
-          </select>
-          <select
-            className="catalog-select"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          >
-            <option value="all">All Prices</option>
-            <option value="0-40">Under $40</option>
-            <option value="40-70">$40&ndash;$70</option>
-            <option value="70-200">$70+</option>
-          </select>
-          <input
-            type="text"
-            className="catalog-search"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button className="clear-filters-btn" onClick={clearFilters}>
-            Clear Filters
-          </button>
-        </div>
-      </div>
-
-      <div className="catalog-product-grid">
-        {filtered.length === 0 ? (
-          <div className="catalog-no-results">
-            <h3>No products found</h3>
-            <p>Try adjusting your filters or search term.</p>
+    <div className="catalog-product-grid">
+      {products.map((product) => (
+        <div key={product.id} className="catalog-card">
+          <div className={`catalog-card-illustration${product.image ? ' has-image' : ''}`}>
+            {product.image ? (
+              <img
+                src={product.image.startsWith('/') ? product.image : `/${product.image}`}
+                alt={product.imageAlt || product.name}
+                className="catalog-card-image"
+                loading="lazy"
+              />
+            ) : (
+              getGarmentSVG(product.garmentType)
+            )}
+            {product.badge && (
+              <span className={`catalog-card-badge ${product.badge.toLowerCase()}`}>
+                {product.badge}
+              </span>
+            )}
           </div>
-        ) : (
-          filtered.map((product) => (
-            <div key={product.id} className="catalog-card">
-              <div className={`catalog-card-illustration${product.image ? ' has-image' : ''}`}>
-                {product.image ? (
-                  <img
-                    src={product.image.startsWith('/') ? product.image : `/${product.image}`}
-                    alt={product.imageAlt || product.name}
-                    className="catalog-card-image"
-                    loading="lazy"
-                  />
-                ) : (
-                  getGarmentSVG(product.garmentType)
-                )}
-                {product.badge && (
-                  <span className={`catalog-card-badge ${product.badge.toLowerCase()}`}>
-                    {product.badge}
-                  </span>
-                )}
-              </div>
-              <div className="catalog-card-info">
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <div className="catalog-card-meta">
-                  <span className="catalog-card-price">
-                    ${product.priceMin}&ndash;${product.priceMax}
-                  </span>
-                  <span className="catalog-card-method">
-                    {formatMethod(product.productionMethod)}
-                  </span>
-                </div>
-              </div>
+          <div className="catalog-card-info">
+            <h3>{product.name}</h3>
+            <p>{product.description}</p>
+            <div className="catalog-card-meta">
+              <span className="catalog-card-price">
+                ${product.priceMin}&ndash;${product.priceMax}
+              </span>
+              <span className="catalog-card-method">
+                {formatMethod(product.productionMethod)}
+              </span>
             </div>
-          ))
-        )}
-      </div>
-
-      <div className="catalog-results">
-        <span className="catalog-result-count">
-          {filtered.length} product{filtered.length !== 1 ? 's' : ''}
-        </span>
-      </div>
-    </>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
