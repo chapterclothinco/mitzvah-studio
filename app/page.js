@@ -17,7 +17,7 @@ export default function HomePage() {
               Mitzvah Merch That Actually <span className="gradient-text animated-gradient">Slaps</span>
             </h1>
             <p className="hero-subtitle animate-in delay-2">
-              Forget generic party favors. We design and manufacture fully custom hoodies, tees, hats, and more &mdash; created from scratch to match your vision. No templates. No limits. Just merch your guests will fight over.
+              Forget generic party favors. We design and manufacture fully custom hoodies, tees, hats, and more &mdash; created from scratch to match your vision. Design is 100% free, and we don&apos;t stop until you love it. No templates. No limits. Just merch your guests will fight over.
             </p>
             <div className="hero-ctas animate-in delay-3">
               <a href="#contact" className="btn btn-primary btn-glow">
@@ -60,6 +60,8 @@ export default function HomePage() {
             <span className="marquee-dot">&#10022;</span>
             <span>Designed For You</span>
             <span className="marquee-dot">&#10022;</span>
+            <span>Free Design</span>
+            <span className="marquee-dot">&#10022;</span>
             <span>Fully Custom</span>
             <span className="marquee-dot">&#10022;</span>
             <span>Trend-Forward</span>
@@ -69,6 +71,8 @@ export default function HomePage() {
             <span>Limitless Options</span>
             <span className="marquee-dot">&#10022;</span>
             <span>Designed For You</span>
+            <span className="marquee-dot">&#10022;</span>
+            <span>Free Design</span>
             <span className="marquee-dot">&#10022;</span>
           </div>
         </div>
@@ -80,7 +84,7 @@ export default function HomePage() {
           <div className="section-header scroll-reveal">
             <span className="section-tag">What We Create</span>
             <h2>Fully Custom Merch for an <span className="gradient-text">Epic Mitzvah</span></h2>
-            <p className="section-subtitle">We don&apos;t slap logos on blanks. Our design team creates original artwork tailored to your theme, then manufactures every piece from scratch on premium blanks. The result? One-of-a-kind merch that looks like it came from a real brand &mdash; because it did. Yours.</p>
+            <p className="section-subtitle">We don&apos;t slap logos on blanks. Our in-house design team &mdash; young creatives who know what&apos;s actually trending &mdash; creates original artwork tailored to your theme, 100% free. We go back and forth until you love it, then manufacture every piece from scratch on premium blanks. The result? One-of-a-kind merch that looks like it came from a real brand &mdash; because it did. Yours.</p>
           </div>
           <div className="product-grid">
             <div className="product-card scroll-reveal" data-delay="0">
@@ -180,7 +184,7 @@ export default function HomePage() {
             <div className="step scroll-reveal" data-delay="0">
               <div className="step-number"><span>1</span></div>
               <h3>Share Your Vision</h3>
-              <p>Tell us about your theme, vibe, colors &mdash; or just send a Pinterest board. Our design team lives and breathes teen trends, so even if you&apos;re starting from zero, we&apos;ve got you.</p>
+              <p>Tell us your theme, vibe, colors &mdash; or just send a Pinterest board. Our design team is made up of young creatives who actually understand what kids want to wear. Even if you&apos;re starting from zero, we&apos;ve got you.</p>
             </div>
             <div className="step-connector scroll-reveal" data-delay="1">
               <svg viewBox="0 0 100 20" preserveAspectRatio="none">
@@ -195,8 +199,8 @@ export default function HomePage() {
             </div>
             <div className="step scroll-reveal" data-delay="2">
               <div className="step-number"><span>2</span></div>
-              <h3>We Design, You Approve</h3>
-              <p>This isn&apos;t template customization. Our designers create original artwork tailored to your Mitzvah. We&apos;ll send mockups, you give feedback, we refine until it&apos;s exactly right.</p>
+              <h3>We Design (100% Free), You Approve</h3>
+              <p>Our design team &mdash; hip young creatives who actually understand what kids like &mdash; builds original artwork from scratch around your vision. We go back and forth until every detail is perfect. And the design work? It&apos;s completely free.</p>
             </div>
             <div className="step-connector scroll-reveal" data-delay="3">
               <svg viewBox="0 0 100 20" preserveAspectRatio="none">
