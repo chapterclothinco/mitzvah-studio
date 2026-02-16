@@ -1,7 +1,7 @@
 [
   {
     "id": "ms-001",
-    "name": "Classic Tee",
+    "name": "Ethan's Classic TeeEE",
     "category": "tops",
     "garmentType": "t-shirt",
     "productionMethod": "screen-print",
@@ -15,7 +15,7 @@
   },
   {
     "id": "ms-002",
-    "name": "Crewneck Sweatshirt",
+    "name": "Crewneck Sweatshirt Ethan",
     "category": "tops",
     "garmentType": "sweatshirt",
     "productionMethod": "cut-and-sew",
