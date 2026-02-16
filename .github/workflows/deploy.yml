@@ -23,6 +23,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Sync catalog data to public directory
+        run: |
+          mkdir -p public/data
+          cp data/catalog.json public/data/catalog.json
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

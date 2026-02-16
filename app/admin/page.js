@@ -26,6 +26,11 @@ function useHideGlobalLayout() {
 
 const PASSPHRASE = 'mitzvah2026';
 
+const LS_KEY_PRODUCTS = 'mitzvah-admin-products';
+const LS_KEY_GITHUB_PAT = 'mitzvah-admin-github-pat';
+const GITHUB_REPO = 'chapterclothinco/mitzvah-studio';
+const GITHUB_FILE_PATH = 'data/catalog.json';
+
 const CATEGORIES = [
   { value: 'tops', label: 'Tops' },
   { value: 'bottoms', label: 'Bottoms' },
@@ -93,6 +98,9 @@ export default function AdminPage() {
   const [imageStore, setImageStore] = useState({});
   const [selectedId, setSelectedId] = useState(null);
   const [toast, setToast] = useState({ message: '', type: '', visible: false });
+  const [deploying, setDeploying] = useState(false);
+  const [hasLocalChanges, setHasLocalChanges] = useState(false);
+  const skipNextAutoSave = useRef(false);
   const fileInputRef = useRef(null);
 
   const showToast = useCallback((message, type = 'success') => {
@@ -113,6 +121,23 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (authenticated) {
+      // Try loading from localStorage first
+      try {
+        const saved = localStorage.getItem(LS_KEY_PRODUCTS);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setProducts(parsed);
+            setHasLocalChanges(true);
+            showToast('Restored ' + parsed.length + ' products from local storage', 'success');
+            return;
+          }
+        }
+      } catch (e) {
+        // localStorage unavailable or corrupt, fall through to fetch
+      }
+      // Fall back to fetching catalog.json
+      skipNextAutoSave.current = true;
       fetch('/data/catalog.json')
         .then((res) => res.json())
         .then((data) => {
@@ -274,6 +299,154 @@ export default function AdminPage() {
     'embroidered': 'Embroidered',
   };
 
+  // Auto-save products to localStorage whenever they change
+  useEffect(() => {
+    if (authenticated && products.length > 0) {
+      if (skipNextAutoSave.current) {
+        skipNextAutoSave.current = false;
+        return;
+      }
+      try {
+        localStorage.setItem(LS_KEY_PRODUCTS, JSON.stringify(products));
+        setHasLocalChanges(true);
+      } catch (e) {
+        // localStorage full or unavailable
+      }
+    }
+  }, [products, authenticated]);
+
+  // Clear local changes and reload from catalog.json
+  const clearLocalChanges = () => {
+    if (!confirm('Discard all local changes and reload catalog from server?')) return;
+    try {
+      localStorage.removeItem(LS_KEY_PRODUCTS);
+    } catch (e) {
+      // ignore
+    }
+    setHasLocalChanges(false);
+    setSelectedId(null);
+    skipNextAutoSave.current = true;
+    fetch('/data/catalog.json')
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+        showToast('Catalog reloaded from server \u2014 ' + data.length + ' products', 'success');
+      })
+      .catch(() => {
+        setProducts([]);
+        showToast('Could not load catalog.json', 'error');
+      });
+  };
+
+  // Save & Deploy to GitHub via Contents API
+  const saveAndDeploy = async () => {
+    let pat = null;
+    try {
+      pat = localStorage.getItem(LS_KEY_GITHUB_PAT);
+    } catch (e) {
+      // ignore
+    }
+    if (!pat) {
+      pat = prompt(
+        'Enter your GitHub Personal Access Token (PAT).\n\n' +
+        'This token needs "repo" or "contents:write" scope for the\n' +
+        GITHUB_REPO + ' repository.\n\n' +
+        'It will be stored in localStorage for future use.'
+      );
+      if (!pat || !pat.trim()) {
+        showToast('Deploy cancelled \u2014 no token provided', 'error');
+        return;
+      }
+      pat = pat.trim();
+      try {
+        localStorage.setItem(LS_KEY_GITHUB_PAT, pat);
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    setDeploying(true);
+
+    try {
+      // Step 1: Get current file SHA
+      const getRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`,
+        {
+          headers: {
+            Authorization: `Bearer ${pat}`,
+            Accept: 'application/vnd.github.v3+json',
+          },
+        }
+      );
+
+      let sha = null;
+      if (getRes.ok) {
+        const fileData = await getRes.json();
+        sha = fileData.sha;
+      } else if (getRes.status === 404) {
+        // File doesn't exist yet, will create it
+        sha = null;
+      } else if (getRes.status === 401 || getRes.status === 403) {
+        // Bad token, clear it so user can re-enter
+        try { localStorage.removeItem(LS_KEY_GITHUB_PAT); } catch (e) {}
+        throw new Error('Authentication failed. Your token has been cleared \u2014 try again with a valid token.');
+      } else {
+        throw new Error(`GitHub API error: ${getRes.status} ${getRes.statusText}`);
+      }
+
+      // Step 2: Base64-encode the catalog JSON
+      const catalogJSON = JSON.stringify(products, null, 2) + '\n';
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode(catalogJSON);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64Content = btoa(binary);
+
+      // Step 3: PUT the updated file
+      const putBody = {
+        message: 'Update catalog.json via admin panel',
+        content: base64Content,
+        branch: 'main',
+      };
+      if (sha) putBody.sha = sha;
+
+      const putRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${pat}`,
+            Accept: 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(putBody),
+        }
+      );
+
+      if (!putRes.ok) {
+        if (putRes.status === 401 || putRes.status === 403) {
+          try { localStorage.removeItem(LS_KEY_GITHUB_PAT); } catch (e) {}
+          throw new Error('Authentication failed. Your token has been cleared \u2014 try again.');
+        }
+        const errData = await putRes.json().catch(() => ({}));
+        throw new Error(errData.message || `GitHub API error: ${putRes.status}`);
+      }
+
+      // Success - clear local changes marker since data is now deployed
+      try {
+        localStorage.removeItem(LS_KEY_PRODUCTS);
+      } catch (e) {}
+      setHasLocalChanges(false);
+      showToast('Catalog deployed to GitHub! Site rebuild triggered.', 'success');
+    } catch (err) {
+      showToast('Deploy failed: ' + err.message, 'error');
+    } finally {
+      setDeploying(false);
+    }
+  };
+
   // Admin styles (inline, matching original admin.html)
   const adminStyles = `
     .admin-page { all: initial; font-family: var(--font-body); }
@@ -361,6 +534,14 @@ export default function AdminPage() {
     .admin-toast.visible { transform: translateY(0); opacity: 1; }
     .admin-toast.success { border-left: 4px solid #34D399; }
     .admin-toast.error { border-left: 4px solid var(--hot-pink); }
+    .admin-btn-deploy { background: linear-gradient(135deg, #34D399 0%, #059669 100%); color: var(--white); }
+    .admin-btn-deploy:hover { box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4); transform: translateY(-1px); }
+    .admin-btn-deploy:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .admin-btn-clear { background: transparent; color: var(--gray-400); border: 1px solid var(--gray-600); }
+    .admin-btn-clear:hover { border-color: var(--gray-400); color: var(--white); }
+    .admin-local-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 8px; border-radius: 100px; background: rgba(251, 191, 36, 0.2); color: #FBBF24; margin-left: 8px; }
+    @keyframes admin-spin { to { transform: rotate(360deg); } }
+    .admin-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: var(--white); border-radius: 50%; animation: admin-spin 0.6s linear infinite; }
   `;
 
   if (!authenticated) {
@@ -394,8 +575,15 @@ export default function AdminPage() {
           <div className="admin-topbar-left">
             <img src="/assets/Submark.svg" alt="" className="admin-topbar-logo" />
             <h1>Product Manager</h1>
+            {hasLocalChanges && <span className="admin-local-badge">Unsaved</span>}
           </div>
           <div className="admin-topbar-actions">
+            {hasLocalChanges && (
+              <button className="admin-btn admin-btn-clear" onClick={clearLocalChanges}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+                Clear Local
+              </button>
+            )}
             <button className="admin-btn admin-btn-secondary" onClick={exportJSON}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export JSON
@@ -403,6 +591,16 @@ export default function AdminPage() {
             <button className="admin-btn admin-btn-primary" onClick={downloadAll}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download All
+            </button>
+            <button className="admin-btn admin-btn-deploy" onClick={saveAndDeploy} disabled={deploying}>
+              {deploying ? (
+                <><span className="admin-spinner" /> Deploying...</>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg>
+                  Save &amp; Deploy
+                </>
+              )}
             </button>
           </div>
         </div>
