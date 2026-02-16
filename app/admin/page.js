@@ -2,27 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-// Hide global layout elements on admin page
-function useHideGlobalLayout() {
-  useEffect(() => {
-    const navbar = document.querySelector('.navbar');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    const footer = document.querySelector('.footer');
-    const floatingShapes = document.querySelector('.floating-shapes');
-    if (navbar) navbar.style.display = 'none';
-    if (mobileMenu) mobileMenu.style.display = 'none';
-    if (footer) footer.style.display = 'none';
-    if (floatingShapes) floatingShapes.style.display = 'none';
-    document.body.style.overflow = 'hidden';
-    return () => {
-      if (navbar) navbar.style.display = '';
-      if (mobileMenu) mobileMenu.style.display = '';
-      if (footer) footer.style.display = '';
-      if (floatingShapes) floatingShapes.style.display = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
-}
 
 const PASSPHRASE = 'mitzvah2026';
 
@@ -88,7 +67,6 @@ function getGarmentSVG(type) {
 }
 
 export default function AdminPage() {
-  useHideGlobalLayout();
   const [authenticated, setAuthenticated] = useState(false);
   const [authError, setAuthError] = useState(false);
   const [products, setProducts] = useState([]);
@@ -265,7 +243,7 @@ export default function AdminPage() {
         setProducts((prev) =>
           prev.map((p) =>
             p.id === selectedId
-              ? { ...p, image: `images/products/${fileName}` }
+              ? { ...p, image: `/images/products/${fileName}` }
               : p
           )
         );
@@ -339,10 +317,21 @@ export default function AdminPage() {
   const saveAndDeploy = async () => {
     setDeploying(true);
     try {
+      // Build images payload from imageStore
+      const images = {};
+      Object.entries(imageStore).forEach(([productId, img]) => {
+        if (img.dataUrl) {
+          images[productId] = {
+            fileName: img.fileName,
+            dataUrl: img.dataUrl,
+          };
+        }
+      });
+
       const res = await fetch('/api/save-catalog', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ products }),
+        body: JSON.stringify({ products, images }),
       });
       const data = await res.json();
       if (!res.ok) {

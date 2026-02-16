@@ -1,11 +1,6 @@
 import { Sora, Inter } from 'next/font/google';
 import '@/styles/globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import FloatingShapes from '@/components/FloatingShapes';
-import ScrollAnimations from '@/components/ScrollAnimations';
-import SmoothScroll from '@/components/SmoothScroll';
-import ParallaxShapes from '@/components/ParallaxShapes';
+import LayoutShell from '@/components/LayoutShell';
 
 const sora = Sora({
   subsets: ['latin'],
@@ -33,13 +28,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${sora.variable} ${inter.variable}`}>
       <body>
-        <FloatingShapes />
-        <Navbar />
-        {children}
-        <Footer />
-        <ScrollAnimations />
-        <SmoothScroll />
-        <ParallaxShapes />
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );
