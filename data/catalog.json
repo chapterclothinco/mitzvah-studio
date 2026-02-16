@@ -1,12 +1,12 @@
 [
   {
     "id": "ms-001",
-    "name": "Signature Mockneck",
+    "name": "Mockneck!!",
     "category": "tops",
     "garmentType": "t-shirt",
     "productionMethod": "screen-print",
-    "priceMin": 50,
-    "priceMax": 75,
+    "priceMin": 55,
+    "priceMax": 70,
     "minOrder": 15,
     "badge": "ESSENTIAL",
     "description": "Premium cotton tee with sophisticated typography and custom graphics. The go-to piece for any Mitzvah celebration.",
@@ -15,7 +15,7 @@
   },
   {
     "id": "ms-002",
-    "name": "Crewneck Sweatshirt Ethan",
+    "name": "Crewneck Sweatshirt",
     "category": "tops",
     "garmentType": "sweatshirt",
     "productionMethod": "cut-and-sew",
@@ -248,20 +248,6 @@
     "minOrder": 24,
     "badge": null,
     "description": "Custom crew socks with all-over print design. A fun swag table extra everyone loves.",
-    "image": "",
-    "imageAlt": ""
-  },
-  {
-    "id": "ms-019",
-    "name": "",
-    "category": "tops",
-    "garmentType": "t-shirt",
-    "productionMethod": "screen-print",
-    "priceMin": 0,
-    "priceMax": 0,
-    "minOrder": 15,
-    "badge": null,
-    "description": "",
     "image": "",
     "imageAlt": ""
   }
