@@ -55,7 +55,6 @@ export default function Navbar() {
             <span></span>
           </button>
           <ul className="nav-links">
-            <li><a href="#shop">Shop</a></li>
             <li><Link href="/catalog">Catalog</Link></li>
             <li><a href="#process">How It Works</a></li>
             <li><a href="#faq">FAQ</a></li>
@@ -72,7 +71,6 @@ export default function Navbar() {
 
       <div className={`mobile-menu${menuOpen ? ' active' : ''}`}>
         <div className="mobile-menu-links">
-          <a href="#shop" onClick={closeMenu}>Shop</a>
           <Link href="/catalog" onClick={closeMenu}>Catalog</Link>
           <a href="#process" onClick={closeMenu}>How It Works</a>
           <a href="#faq" onClick={closeMenu}>FAQ</a>
