@@ -11,8 +11,8 @@ export default function CatalogPage() {
     <section className="catalog-page">
       <div className="container">
         <div className="section-header">
-          <h2>The <span className="gradient-text">Collection</span></h2>
-          <p className="section-subtitle">A look at what we do best. Every piece below was designed from scratch and manufactured on premium blanks.</p>
+          <h2>Our <span className="gradient-text">Best Sellers</span></h2>
+          <p className="section-subtitle">Our top picks &mdash; but this just scratches the surface. We design and manufacture everything from scratch, so whatever you&apos;re imagining, we can make it happen.</p>
         </div>
 
         <CatalogGrid />
