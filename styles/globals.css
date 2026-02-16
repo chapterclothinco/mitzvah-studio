@@ -1656,6 +1656,17 @@ h1, h2, h3 {
     margin-bottom: 12px;
 }
 
+.catalog-sizing {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--gray-400);
+    letter-spacing: 0.03em;
+}
+
+.catalog-sizing strong {
+    color: var(--gray-600);
+}
+
 /* Product Grid */
 .catalog-product-grid {
     display: grid;

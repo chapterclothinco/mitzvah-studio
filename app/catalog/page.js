@@ -13,6 +13,7 @@ export default function CatalogPage() {
         <div className="section-header">
           <h2>Our <span className="gradient-text">Best Sellers</span></h2>
           <p className="section-subtitle">Our top picks &mdash; but this just scratches the surface. We design and manufacture everything from scratch, so whatever you&apos;re imagining, we can make it happen.</p>
+          <p className="catalog-sizing">All items available in sizes <strong>4XS&ndash;4XL</strong></p>
         </div>
 
         <CatalogGrid />
