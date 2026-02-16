@@ -11,22 +11,24 @@ export default function CatalogPage() {
     <section className="catalog-page">
       <div className="container">
         <div className="section-header">
-          <span className="section-tag">Best Sellers</span>
-          <h2>Our Most <span className="gradient-text">Popular</span> Pieces</h2>
-          <p className="section-subtitle">These are some of our most-loved products &mdash; but this is just the start. We design and manufacture everything from scratch, so if you don&apos;t see exactly what you&apos;re looking for, just tell us. We&apos;ll make it.</p>
+          <h2>The <span className="gradient-text">Collection</span></h2>
+          <p className="section-subtitle">A look at what we do best. Every piece below was designed from scratch and manufactured on premium blanks.</p>
         </div>
 
         <CatalogGrid />
 
-        <div className="catalog-cta">
-          <h3>Don&apos;t see what you need? We&apos;ll create it.</h3>
-          <p>Hoodies, jerseys, robes, pajamas, bucket hats, fanny packs &mdash; you name it. Everything we make is designed from scratch and fully custom. If you can dream it, we can manufacture it.</p>
-          <Link href="/#contact" className="btn btn-primary btn-glow">
-            <span>Tell Us What You Want</span>
-            <svg className="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
+        <div className="catalog-cta-section">
+          <div className="catalog-cta-inner">
+            <span className="section-tag">100% Custom</span>
+            <h2>We make <span className="gradient-text">anything</span> you want.</h2>
+            <p>This is just what&apos;s popular. If you have something else in mind &mdash; a jersey, a bucket hat, matching pajama sets, literally anything &mdash; we&apos;ll design it from scratch and manufacture it for you.</p>
+            <Link href="/#contact" className="btn btn-primary btn-glow">
+              <span>Start Your Project</span>
+              <svg className="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </section>
