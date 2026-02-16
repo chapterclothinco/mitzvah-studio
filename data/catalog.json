@@ -250,5 +250,19 @@
     "description": "Custom crew socks with all-over print design. A fun swag table extra everyone loves.",
     "image": "",
     "imageAlt": ""
+  },
+  {
+    "id": "ms-019",
+    "name": "",
+    "category": "tops",
+    "garmentType": "t-shirt",
+    "productionMethod": "screen-print",
+    "priceMin": 0,
+    "priceMax": 0,
+    "minOrder": 15,
+    "badge": null,
+    "description": "",
+    "image": "",
+    "imageAlt": ""
   }
 ]
