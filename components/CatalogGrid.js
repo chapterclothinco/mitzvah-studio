@@ -242,7 +242,7 @@ export default function CatalogGrid() {
               <div className={`catalog-card-illustration${product.image ? ' has-image' : ''}`}>
                 {product.image ? (
                   <img
-                    src={product.image}
+                    src={product.image.startsWith('/') ? product.image : `/${product.image}`}
                     alt={product.imageAlt || product.name}
                     className="catalog-card-image"
                     loading="lazy"
